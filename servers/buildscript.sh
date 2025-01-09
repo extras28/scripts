@@ -2,8 +2,10 @@
 
 # Define variables
 PROJECT=""
+PERSONAL_DIR=""
+SERVER_NAME=""
 VERSION=$(date +"%Y%m%d%H%M%S")  # Use timestamp as version
-BASE_DIR="/home/vea/dungna31/${PROJECT}"
+BASE_DIR="/home/${SERVERNAME}/${PERSONAL_DIR}/${PROJECT}"
 LOG_DIR="${BASE_DIR}/logs"       # Log directory
 ROLLBACK_DIR="${BASE_DIR}/rollback"  # Directory for rollback images
 VERSION_BACKUP_DIR="${ROLLBACK_DIR}/${VERSION}" # Directory for database backups
@@ -12,7 +14,7 @@ NEW_IMAGE="${BASE_DIR}/${PROJECT}.tar"
 OLD_IMAGE="${ROLLBACK_DIR}/${VERSION}/${PROJECT}_${VERSION}.tar"
 
 # Database variables
-CONTAINER_NAME=""
+DB_CONTAINER_NAME="${PROJECT}_mariadb_1"
 DB_USER=""  # Replace with your DB user
 DB_PASS=""  # Replace with your DB password
 DB_NAME=""  # Replace with your database name
@@ -42,7 +44,7 @@ fi
 
 # Backup database
 log "Backing up database..."
-CONTAINER_IP=$(sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER_NAME")
+CONTAINER_IP=$(sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$DB_CONTAINER_NAME")
 if mysqldump -h "$CONTAINER_IP" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "${VERSION_BACKUP_DIR}/${DB_NAME}_backup.sql"; then
   log "Database backup successful: ${VERSION_BACKUP_DIR}/${DB_NAME}_backup.sql"
 else
@@ -103,3 +105,4 @@ fi
 
 # Finish
 log "Build process completed."
+sudo docker logs -f ${PROJECT}_${PROJECT}_1
