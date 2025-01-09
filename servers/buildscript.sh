@@ -93,15 +93,16 @@ log "Old logs cleaned up."
 
 # Rollback directory cleanup: Keep only the 7 most recent versions
 log "Cleaning up old rollback versions..."
-BACKUP_COUNT=$(ls -1 "$ROLLBACK_DIR" | grep -E `${PROJECT}_\d{8}\.tar` | wc -l)
+BACKUP_COUNT=$(ls -1 "$ROLLBACK_DIR" | grep -E "^[0-9]{14}$" | wc -l)  # Match 14-digit timestamp
 if [ "$BACKUP_COUNT" -gt 7 ]; then
-  # Get the oldest files to delete
-  OLD_FILES=$(ls -1t "$ROLLBACK_DIR" | grep -E `${PROJECT}_\d{8}\.tar` | tail -n +8)
+  # Get the oldest files to delete (keep the 7 most recent)
+  OLD_FILES=$(ls -1t "$ROLLBACK_DIR" | grep -E "^[0-9]{14}$" | tail -n +8)
   for FILE in $OLD_FILES; do
     rm -f "$ROLLBACK_DIR/$FILE"
     log "Removed old rollback image: $FILE"
   done
 fi
+
 
 # Finish
 log "Build process completed."
